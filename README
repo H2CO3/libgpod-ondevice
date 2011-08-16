@@ -1,4 +1,4 @@
-libgpod v0.8.2ondevice1 is a for of libgpod, the Linux library which allows one to add music and/or videos to the iPod.app. It has now been fixed so that itdb postprocess commands work properly without libimobiledevice. For a more convenient, object-oriented aspect, please consult MFMusicLibrary.framework.
+libgpod v0.8.2ondevice1 is an iPhone fork of libgpod, the Linux library which allows one to add music and/or videos to the iPod.app. It has now been fixed so that itdb postprocess commands work properly without libimobiledevice. For a more convenient, object-oriented aspect, please consult MFMusicLibrary.framework.
 Patches by Árpád Goretity (H2CO3) and Sirakain.
 Licensed under the LGPL (as the original work).
 
