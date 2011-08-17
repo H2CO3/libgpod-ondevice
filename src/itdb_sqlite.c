@@ -64,7 +64,7 @@ static glong sort_offsets[][4] = {
     { G_STRUCT_OFFSET(Itdb_Track, sort_title),       G_STRUCT_OFFSET(Itdb_Track, title) },
     { G_STRUCT_OFFSET(Itdb_Track, sort_artist),      G_STRUCT_OFFSET(Itdb_Track, artist) },
     { G_STRUCT_OFFSET(Itdb_Track, sort_album),       G_STRUCT_OFFSET(Itdb_Track, album) },
-    { G_STRUCT_OFFSET(Itdb_Track, genre),            0 },
+    { G_STRUCT_OFFSET(Itdb_Track, genre),	    0 },
     { G_STRUCT_OFFSET(Itdb_Track, sort_composer),    G_STRUCT_OFFSET(Itdb_Track, composer) },
     { G_STRUCT_OFFSET(Itdb_Track, sort_artist),      G_STRUCT_OFFSET(Itdb_Track, artist) },
     /* TODO: iTunes sorts first by album_artist, then by artist. */
@@ -82,9 +82,9 @@ static gchar *sort_field(Itdb_Track *track, guint member)
     for (i = 0; i < 4; i++) {
 	offset = sort_offsets[member][i];
 	field = G_STRUCT_MEMBER(gchar *, track, offset);
-        if (offset != 0 && field != NULL && *field) {
-            return field;
-        }
+	if (offset != 0 && field != NULL && *field) {
+	    return field;
+	}
     }
     return NULL;
 }
@@ -97,7 +97,7 @@ static int lookup_order(GHashTable **order_hashes, guint member, Itdb_Track *tra
 
     key = sort_field(track, member);
     if (key == NULL) {
-        return 100;
+	return 100;
     }
 
     return GPOINTER_TO_UINT(g_hash_table_lookup(order_hashes[member], key));
@@ -109,15 +109,15 @@ static gint compare_track_fields(gconstpointer lhs, gconstpointer rhs)
     const gchar *field_rhs = (const gchar *)rhs;
 
     if (field_lhs == NULL && field_rhs == NULL) {
-        return 0;
+	return 0;
     }
 
     if (field_lhs == NULL) {
-        return -1;
+	return -1;
     }
 
     if (field_rhs == NULL) {
-        return 1;
+	return 1;
     }
 
     /* FIXME: should probably generate collation keys first */
@@ -129,7 +129,7 @@ static gboolean traverse_tracks(gpointer key, gpointer value, gpointer data)
     GHashTable *hash = (GHashTable *)data;
 
     if (key != NULL) {
-        g_hash_table_insert(hash, key, GUINT_TO_POINTER((g_hash_table_size(hash) + 1) * 100));
+	g_hash_table_insert(hash, key, GUINT_TO_POINTER((g_hash_table_size(hash) + 1) * 100));
     }
     return FALSE;
 }
@@ -143,22 +143,22 @@ static GHashTable **compute_key_orders(GList *tracks)
     g_assert (result != NULL);
 
     for (i = 0; i < ORDER_END; i++) {
-        GList *li;
-        GTree *tree;
+	GList *li;
+	GTree *tree;
 
-        tree = g_tree_new(compare_track_fields);
+	tree = g_tree_new(compare_track_fields);
 
-        for (li = tracks; li != NULL; li = li->next) {
-            Itdb_Track *track = (Itdb_Track *)li->data;
+	for (li = tracks; li != NULL; li = li->next) {
+	    Itdb_Track *track = (Itdb_Track *)li->data;
 
-            g_tree_insert(tree, sort_field(track, i), 0);
-        }
+	    g_tree_insert(tree, sort_field(track, i), 0);
+	}
 
-        result[i] = g_hash_table_new(g_str_hash, g_str_equal);
-        g_assert (result[i] != NULL);
+	result[i] = g_hash_table_new(g_str_hash, g_str_equal);
+	g_assert (result[i] != NULL);
 
-        g_tree_foreach(tree, traverse_tracks, (gpointer)result[i]);
-        g_tree_destroy(tree);
+	g_tree_foreach(tree, traverse_tracks, (gpointer)result[i]);
+	g_tree_destroy(tree);
     }
 
     return result;
@@ -169,7 +169,7 @@ static void destroy_key_orders(GHashTable **orders)
     int i;
 
     for (i = 0; i < ORDER_END; i++) {
-        g_hash_table_destroy(orders[i]);
+	g_hash_table_destroy(orders[i]);
     }
 
     g_free(orders);
@@ -571,11 +571,11 @@ static void bind_first_text(sqlite3_stmt *stmt, int idx, int n, ...)
 
     va_start(ap, n);
     for (i = 0; i < n; i++) {
-        char *str = va_arg(ap, char*);
-        if (str && *str) {
+	char *str = va_arg(ap, char*);
+	if (str && *str) {
 	    sqlite3_bind_text(stmt, idx, str, -1, SQLITE_STATIC);
-            goto done;
-        }
+	    goto done;
+	}
     }
     sqlite3_bind_null(stmt, idx);
 done:
@@ -1014,25 +1014,25 @@ static int mk_Library(Itdb_iTunesDB *itdb,
 	}
 	sqlite3_bind_int64(stmt_item, ++idx, composer_pid);
 	/* title */
-        bind_first_text(stmt_item, ++idx, 1, track->title);
+	bind_first_text(stmt_item, ++idx, 1, track->title);
 	/* artist */
-        bind_first_text(stmt_item, ++idx, 1, track->artist);
+	bind_first_text(stmt_item, ++idx, 1, track->artist);
 	/* album */
-        bind_first_text(stmt_item, ++idx, 1, track->album);
+	bind_first_text(stmt_item, ++idx, 1, track->album);
 	/* album_artist */
-        bind_first_text(stmt_item, ++idx, 1, track->albumartist);
+	bind_first_text(stmt_item, ++idx, 1, track->albumartist);
 	/* composer */
-        bind_first_text(stmt_item, ++idx, 1, track->composer);
+	bind_first_text(stmt_item, ++idx, 1, track->composer);
 	/* sort_title */
-        bind_first_text(stmt_item, ++idx, 2, track->sort_title, track->title);
+	bind_first_text(stmt_item, ++idx, 2, track->sort_title, track->title);
 	/* sort_artist */
-        bind_first_text(stmt_item, ++idx, 2, track->sort_artist, track->artist);
+	bind_first_text(stmt_item, ++idx, 2, track->sort_artist, track->artist);
 	/* sort_album */
-        bind_first_text(stmt_item, ++idx, 2, track->sort_album, track->album);
+	bind_first_text(stmt_item, ++idx, 2, track->sort_album, track->album);
 	/* sort_album_artist */
-        bind_first_text(stmt_item, ++idx, 2, track->sort_albumartist, track->albumartist);
+	bind_first_text(stmt_item, ++idx, 2, track->sort_albumartist, track->albumartist);
 	/* sort_composer */
-        bind_first_text(stmt_item, ++idx, 2, track->sort_composer, track->composer);
+	bind_first_text(stmt_item, ++idx, 2, track->sort_composer, track->composer);
 
 	/* TODO figure out where these values are stored */
 	/* title_order */
@@ -1054,9 +1054,9 @@ static int mk_Library(Itdb_iTunesDB *itdb,
 	/* comment */
 	sqlite3_bind_text(stmt_item, ++idx, track->comment, -1, SQLITE_STATIC);
 	/* grouping */
-        bind_first_text(stmt_item, ++idx, 1, track->grouping);
+	bind_first_text(stmt_item, ++idx, 1, track->grouping);
 	/* description */
-        bind_first_text(stmt_item, ++idx, 1, track->description);
+	bind_first_text(stmt_item, ++idx, 1, track->description);
 	/* description_long */
 	/* TODO libgpod doesn't know about it */
 	sqlite3_bind_null(stmt_item, ++idx);
@@ -1321,7 +1321,7 @@ static int mk_Library(Itdb_iTunesDB *itdb,
     printf("[%s] done.\n", __func__);
 leave:
     if (orders != NULL) {
-        destroy_key_orders(orders);
+	destroy_key_orders(orders);
     }
 
     if (stmt_version_info) {
@@ -1760,10 +1760,11 @@ static void run_post_process_commands(Itdb_iTunesDB *itdb, const char *outpath, 
     // get the full XML text data of the postprocess commands
     // directly from the iDevice's file system
     const gchar *ppc_path = "/System/Library/Lockdown/SQLMusicLibraryPostProcessCommands.plist";
-    char *buf;
+    gchar *buf;
     unsigned long ppc_len;
     g_file_get_contents (ppc_path, &buf, &ppc_len, NULL);
-    plist_from_xml(buf, ppc_len, &ppc_dict);
+    plist_from_xml (buf, ppc_len, &ppc_dict);
+    g_free (buf);
 
     /* END PATCH */
 
@@ -1885,7 +1886,7 @@ static void run_post_process_commands(Itdb_iTunesDB *itdb, const char *outpath, 
 				if (val) {
 				    char *errmsg = NULL; 
 				    if (SQLITE_OK == sqlite3_exec(db, val, NULL, NULL, &errmsg)) {
-				        /*printf("[%s] executing '%s': OK", __func__, key);*/
+					/*printf("[%s] executing '%s': OK", __func__, key);*/
 					ok_cnt++;
 				    } else {
 					printf("[%s] ERROR when executing '%s': %s\n", __func__, key, errmsg);
@@ -2085,7 +2086,7 @@ static int build_itdb_files(Itdb_iTunesDB *itdb,
 			     GHashTable *album_ids, GHashTable *artist_ids,
 			     GHashTable *composer_ids,
 			     const char *outpath, const char *uuid,
-                             GError **error)
+			     GError **error)
 {
     if (mk_Dynamic(itdb, outpath) != 0) {
 	g_set_error (error, ITDB_ERROR, ITDB_ERROR_SQLITE,
